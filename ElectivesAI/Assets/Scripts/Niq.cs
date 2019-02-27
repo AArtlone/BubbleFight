@@ -2,21 +2,41 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Niq : Tank
+public class Niq : MonoBehaviour
 {
     public Transform shootingPos; // a reference to the position at which the bullet is instantiated
+    private Tank tankN;
+    private Rigidbody rb;
 
-    public override void Shoot(Transform shootingPos)
+    private float zMov; // float value containing info about direction of the movement
+    private float yRot;// float value containing info about direction of the rotation
+
+    private void Start()
     {
-        shootingPos = this.shootingPos; //assigning the shooting position to the current tank's shooting position
-        base.Shoot(shootingPos);
+        tankN = FindObjectOfType<Tank>(); // reference to the tank class script
+        rb = GetComponent<Rigidbody>(); // reference to the rigidbody
+    }
+
+    //function responsible for the movement and rotation of the tank
+    private void TankMovement()
+    {
+        zMov = Input.GetAxisRaw("Vertical");
+        yRot = Input.GetAxisRaw("Mouse X");
+        tankN.MoveTheTank(zMov, rb, gameObject.transform);
+        tankN.RotateTheTank(yRot, rb);
+    }
+    //shooting function
+    private void TankShooting()
+    {
+        if (Input.GetKeyUp(KeyCode.N))
+        {
+            tankN.Shoot(shootingPos);
+        }
     }
 
     private void Update()
     {
-        if (Input.GetKeyUp(KeyCode.N))
-        {
-            Shoot(shootingPos);
-        }
+        TankShooting();
+        TankMovement();
     }
 }

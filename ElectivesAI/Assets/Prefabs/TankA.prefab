@@ -23,12 +23,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5694433726021350607}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.756, z: 0.538}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.75600004, z: 0.538}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
-  m_Father: {fileID: 5694433726043550423}
-  m_RootOrder: 0
+  m_Father: {fileID: 5694433726394673166}
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5694433726043550412
 GameObject:
@@ -62,7 +62,6 @@ Transform:
   m_LocalPosition: {x: 1.7628078, y: 0.5, z: -0.18835926}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 5694433726021350606}
   - {fileID: 5694433726394673166}
   m_Father: {fileID: 0}
   m_RootOrder: 0
@@ -153,16 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a67e37d2e54d284429960b67177f2c36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Health: 0
-  MovementSpeed: 0
-  RotationSpeed: 0
-  Ammo: 0
-  FireRate: 0
-  FireRange: 0
-  BulletSpeed: 1000
   BulletPrefab: {fileID: 7662685116524615788, guid: fb6f1496342a4d94d9fd1d08c914053d,
     type: 3}
-  Cannon: {fileID: 5694433726716888781}
+  CannonHead: {fileID: 0}
   shootingPos: {fileID: 5694433726021350606}
 --- !u!1 &5694433726394673167
 GameObject:
@@ -193,8 +185,9 @@ Transform:
   m_Children:
   - {fileID: 5694433726932033623}
   - {fileID: 5694433726716888780}
+  - {fileID: 5694433726021350606}
   m_Father: {fileID: 5694433726043550423}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5694433726716888781
 GameObject:

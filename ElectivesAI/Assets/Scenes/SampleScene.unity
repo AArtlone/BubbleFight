@@ -112,12 +112,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &14288736 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5694433726716888781, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
-    type: 3}
-  m_PrefabInstance: {fileID: 177107618}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &104297889 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5694433726021350606, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
@@ -205,6 +199,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TankD
       objectReference: {fileID: 0}
+    - target: {fileID: 5694433726043550412, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5694433726043550423, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -278,6 +277,12 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 5694433726043550422, guid: 7e992d3fe7dfccb4db710716e4fe8b82, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7e992d3fe7dfccb4db710716e4fe8b82, type: 3}
+--- !u!1 &347493737 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5694433726716888781, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+    type: 3}
+  m_PrefabInstance: {fileID: 541004437}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &477451438 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5694433726716888781, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
@@ -378,6 +383,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: TankN
       objectReference: {fileID: 0}
+    - target: {fileID: 5694433726043550412, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 5694433726043550423, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -469,10 +479,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862c38d3685e0274f847b0f035a49a9b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shootingPos: {fileID: 1791463380}
+--- !u!114 &585952919
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 585952912}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31951aa645569014a8d52d089791b356, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   BulletPrefab: {fileID: 7662685116524615788, guid: fb6f1496342a4d94d9fd1d08c914053d,
     type: 3}
-  CannonHead: {fileID: 14288736}
-  shootingPos: {fileID: 1791463380}
+  CannonHead: {fileID: 1582917898}
 --- !u!1001 &968724770
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -484,6 +506,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: TankY
+      objectReference: {fileID: 0}
+    - target: {fileID: 5694433726043550412, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5694433726043550423, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
         type: 3}
@@ -558,18 +585,27 @@ PrefabInstance:
     m_RemovedComponents:
     - {fileID: 5694433726043550422, guid: 7e992d3fe7dfccb4db710716e4fe8b82, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 7e992d3fe7dfccb4db710716e4fe8b82, type: 3}
---- !u!1 &1058317128 stripped
+--- !u!1 &1019031674 stripped
 GameObject:
-  m_CorrespondingSourceObject: {fileID: 5694433726716888781, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+  m_CorrespondingSourceObject: {fileID: 5694433726043550412, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
     type: 3}
-  m_PrefabInstance: {fileID: 968724770}
+  m_PrefabInstance: {fileID: 5694433726508012131}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1406602779 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5694433726716888781, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+--- !u!114 &1019031681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1019031674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31951aa645569014a8d52d089791b356, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  BulletPrefab: {fileID: 7662685116524615788, guid: fb6f1496342a4d94d9fd1d08c914053d,
     type: 3}
-  m_PrefabInstance: {fileID: 541004437}
-  m_PrefabAsset: {fileID: 0}
+  CannonHead: {fileID: 477451438}
 --- !u!1 &1506299519 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5694433726043550412, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
@@ -588,10 +624,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a448e1d4cf207347b058bd5ae1d1fbc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shootingPos: {fileID: 104297889}
+--- !u!114 &1506299526
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1506299519}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31951aa645569014a8d52d089791b356, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   BulletPrefab: {fileID: 7662685116524615788, guid: fb6f1496342a4d94d9fd1d08c914053d,
     type: 3}
-  CannonHead: {fileID: 1058317128}
-  shootingPos: {fileID: 104297889}
+  CannonHead: {fileID: 2098383401}
+--- !u!1 &1582917898 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5694433726716888781, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+    type: 3}
+  m_PrefabInstance: {fileID: 177107618}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1659325442 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5694433726043550412, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
@@ -610,10 +664,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 205a7bfe27014344785d052c3fc43f87, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  shootingPos: {fileID: 1917986977}
+--- !u!114 &1659325449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659325442}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 31951aa645569014a8d52d089791b356, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   BulletPrefab: {fileID: 7662685116524615788, guid: fb6f1496342a4d94d9fd1d08c914053d,
     type: 3}
-  CannonHead: {fileID: 1406602779}
-  shootingPos: {fileID: 1917986977}
+  CannonHead: {fileID: 347493737}
 --- !u!4 &1791463380 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5694433726021350606, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
@@ -718,6 +784,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 541004437}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2098383401 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5694433726716888781, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+    type: 3}
+  m_PrefabInstance: {fileID: 968724770}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &5694433726508012131
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -790,5 +862,10 @@ PrefabInstance:
       propertyPath: CannonHead
       value: 
       objectReference: {fileID: 477451438}
+    - target: {fileID: 5694433726043550422, guid: 7e992d3fe7dfccb4db710716e4fe8b82,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7e992d3fe7dfccb4db710716e4fe8b82, type: 3}
