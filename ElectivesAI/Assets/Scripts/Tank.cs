@@ -18,7 +18,7 @@ public class Tank : MonoBehaviour
     private bool _canShoot = true;
     #endregion
 
-    private const float _fireRange = 5;
+    private const float _fireRange = 10;
     private const float _bulletSpeed = 150f;
     #endregion
 
@@ -117,6 +117,10 @@ public class Tank : MonoBehaviour
     {
         return _turret.transform.eulerAngles;
     }
+    public float GetFireRange()
+    {
+        return _fireRange;
+    }
     #endregion
 
     #region Shooting Related functions
@@ -167,13 +171,16 @@ public class Tank : MonoBehaviour
     // and damages the tank, potentially destroying it.
     private void OnTriggerEnter(Collider other)
     {
-        _health--;
-
-        if (_health <= 0)
+        if(other.tag == "Bullet")
         {
-            Destroy(gameObject);
-        }
+            _health--;
 
-        Destroy(other.gameObject);
+            if (_health <= 0)
+            {
+                Destroy(gameObject);
+            }
+
+            Destroy(other.gameObject);
+        }
     }
 }
