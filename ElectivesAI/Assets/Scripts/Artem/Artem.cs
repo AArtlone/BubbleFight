@@ -9,18 +9,32 @@ public enum PlayStyle
     passive
 }
 
+public enum TankState
+{
+    movingTowardsANode,
+    chasing,
+    dodging
+}
+
 public class Artem : MonoBehaviour
 {
     // Variable to store the tank interface script component for state machine use.
     private Tank _tankInterface;
-
     private PlayStyle _currentPlayStyle;
+    private TankState _currentTanlState;
+    public Renderer ground; // reference to the plane
+    
+    private float gridSize = 2f; //the offset value for each node
+    private GameObject[,] _nodesArray;
+    private MyAStarNode startNode; // reference to the pathfinding algorithm - beginning node
+    private MyAStarNode endNode; // reference to the pathfinding algorithm - end node
 
-    public Renderer ground;
+    public List<MyAStarNode> shortestPath = new List<MyAStarNode>();
 
     private void Start()
     {
         _tankInterface = GetComponent<Tank>();
+        _nodesArray = new GameObject[10, 10];
 
         ChooseRandomPlayStyle();
         CreateAStarGrid();
@@ -30,21 +44,22 @@ public class Artem : MonoBehaviour
     {
         var nodeParent = new GameObject("NodeList");
 
-        var nodeArray = new MyAStarNode[11, 11];
+        var nodeArray = new MyAStarNode[10, 10];
         
-        for (int z = 0; z < 11; z++)
+        for (int z = 0; z < 10; z++)
         {
-            for (int x = 0; x < 11; x++)
+            for (int x = 0; x < 10; x++)
             {
-                var gameObject = new GameObject("Node");
+                var _nodeObject = new GameObject("Node");
                 float _xPos = -ground.bounds.size.x;
                 float _zPos = -ground.bounds.size.z;
-                Vector3 _nodePos = new Vector3(_xPos / 2 + x * 5, 0f, _zPos / 2 + z * 5);
-                gameObject.transform.position = _nodePos;
-                gameObject.transform.parent = nodeParent.transform;
-                gameObject.transform.name = "Node " + x + "/" + z;
-                var node = gameObject.AddComponent<MyAStarNode>();
+                Vector3 _nodePos = new Vector3((_xPos / 2) + gridSize + x * 5, 0f, (_zPos / 2) + gridSize + z * 5);
+                _nodeObject.transform.position = _nodePos;
+                _nodeObject.transform.parent = nodeParent.transform;
+                _nodeObject.transform.name = "Node " + x + "/" + z;
+                var node = _nodeObject.AddComponent<MyAStarNode>();
                 nodeArray[x, z] = node;
+                _nodesArray[x, z] = _nodeObject;
             }
         }
         for (int z = 0; z < 10; z++)
@@ -69,6 +84,72 @@ public class Artem : MonoBehaviour
                 nextNode.connections.Add(currentNode);
             }
         }
+    }
+
+    private void FindShortestPathBlablabla()
+    {
+        GameObject _targetNode = _nodesArray[Random.Range(0, 10), Random.Range(0, 10)];
+        endNode = _targetNode.AddComponent<MyAStarNode>();
+        //transform.LookAt(_targetNode.transform);
+        //shortestPath = FindShortestPath();
+    }
+
+    List<MyAStarNode> FindShortestPath()
+    {
+        var openList = new List<MyAStarNode>();
+        var closedList = new List<MyAStarNode>();
+
+        startNode.g = 0;
+        startNode.f = startNode.g + Vector3.Distance(startNode.transform.position, endNode.transform.position);
+        openList.Add(startNode);
+        while (openList.Count > 0)
+        {
+            var currentNode = openList[0];
+
+            if (currentNode == endNode)
+            {
+                //TODO: return path to caller
+                var path = new List<MyAStarNode>();
+                while (currentNode != startNode)
+                {
+                    path.Add(currentNode);
+                    currentNode = currentNode.pathParent;
+                }
+                path.Add(startNode);
+                return path;
+            }
+
+            openList.Remove(currentNode);
+            closedList.Add(currentNode);
+
+            foreach (var connection in currentNode.connections)
+            {
+                if (closedList.Contains(connection) || connection.unWalkable)
+                {
+                    continue;
+                }
+
+                float g = currentNode.g + Vector3.Distance(currentNode.transform.position, connection.transform.position);
+                bool inOpenList = openList.Contains(connection);
+                if (!inOpenList || g < connection.g)
+                {
+                    connection.g = g;
+                    connection.f = connection.g + Vector3.Distance(connection.transform.position, endNode.transform.position);
+                    connection.pathParent = currentNode;
+
+                    if (!inOpenList)
+                    {
+                        int index = 0;
+                        while (index < openList.Count && openList[index].f < connection.f)
+                        {
+                            index++;
+                        }
+                        openList.Insert(index, connection);
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private void SensorsCheck()
@@ -123,6 +204,11 @@ public class Artem : MonoBehaviour
 
     private void MovingTank()
     {
+        if (Input.GetKeyDown(KeyCode.L))
+        {
+            //FindShortestPathBlablabla();
+            _tankInterface.MoveTheTank("Forward");
+        }
         if (Input.GetKeyUp(KeyCode.K))
         {
             float _targetX = Random.Range(-ground.bounds.size.x, ground.bounds.size.x);
@@ -132,17 +218,9 @@ public class Artem : MonoBehaviour
         }
         if (_currentPlayStyle == PlayStyle.aggresive)
         {
-            //apply agressive movement
-            if(Input.GetKeyUp(KeyCode.K))
-            {
-                float _targetX = Random.Range(-ground.bounds.size.x, ground.bounds.size.x);
-                float _targetZ = Random.Range(-ground.bounds.size.z, ground.bounds.size.z);
-                Vector3 _targetPos = new Vector3(_targetX, 0f, _targetZ);
-                transform.position = Vector3.MoveTowards(transform.position, _targetPos, 5f);
-            }
+            
         } else if(_currentPlayStyle == PlayStyle.passive)
         {
-            //apply passive movement
         }
     }
 
