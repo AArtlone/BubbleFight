@@ -6,6 +6,11 @@ TagManager:
   tags:
   - Tank
   - Wall
+  - Ammo Pickup
+  - NodeN
+  - NodeA
+  - NodeD
+  - NodeY
   layers:
   - Default
   - TransparentFX

@@ -6,14 +6,14 @@ public class Tank : MonoBehaviour
     #region Default tank variables
     private int _health = 10;
 
-    private const float _movementSpeed = 100f;
-    private const float _rotationSpeed = 1f;
-    private const float _turretRotationSpeed = 1f;
+    private const float _movementSpeed = 250f;
+    private const float _rotationSpeed = 100f;
+    private const float _turretRotationSpeed = 5f;
     private Vector3 _turretStartRotation;
     private bool _isTurretRotated = true;
 
     #region Shooting mechanic variables
-    private int _ammo = 10;
+    private int _ammo = 2;
     private const float _fireRate = 1;
     private bool _canShoot = true;
     #endregion
@@ -25,6 +25,7 @@ public class Tank : MonoBehaviour
     #region Tank component references
     private Rigidbody _rb;
     private GameObject _turret;
+    private VisionCone _eyes;
     #endregion
 
     #region References for the shooting function
@@ -32,8 +33,15 @@ public class Tank : MonoBehaviour
     public GameObject CannonHead;  // A reference to the canon head from which the bullet is being shot from
     #endregion
 
+    private void Awake()
+    {
+        string lastLetter = transform.parent.name.Substring(transform.parent.name.Length - 1);
+        GenerateGrid(lastLetter);
+    }
+
     private void Start()
     {
+        _eyes = transform.parent.GetComponentInChildren<VisionCone>();
         _rb = GetComponent<Rigidbody>();
         _turret = transform.GetChild(0).gameObject;
         _turretStartRotation = transform.position;
@@ -62,16 +70,14 @@ public class Tank : MonoBehaviour
     }
 
     // Rotates the tank in such a way as to turn its direction to
-    // an object's position
+    // an object's position on the map
     public void RotateTheTank(Transform objectToRotateTowards)
     {
-        Vector3 targetDir = objectToRotateTowards.position - transform.position;
-
-        Vector3 newDir = Vector3.RotateTowards(transform.forward, targetDir, _rotationSpeed * Time.deltaTime, 0.0f);
+        Quaternion newRotation = Quaternion.LookRotation(objectToRotateTowards.position - transform.position);
 
         // It will slowly turn the player to the new direction it has to
         // look towards.
-        transform.rotation = Quaternion.LookRotation(newDir);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, _rotationSpeed * Time.deltaTime);
     }
 
     // Rotates the turret towards a specified object's transform.
@@ -181,6 +187,67 @@ public class Tank : MonoBehaviour
             }
 
             Destroy(other.gameObject);
+        }
+
+        if (other.tag == "Ammo Pickup")
+        {
+            _ammo += 5;
+            _eyes.Target = null;
+            Destroy(other.gameObject);
+            //Debug.Log("Ammo retrieved.");
+        }
+    }
+
+    private void GenerateGrid(string letter)
+    {
+        var nodeParent = new GameObject("NodeList" + letter);
+        int gridDepth = 100;
+        int gridWidth = 100;
+
+        var nodeArray = new AStarNode[gridDepth, gridWidth];
+        for (int y = 0; y < gridDepth; y++)
+        {
+            for (int x = 0; x < gridWidth; x++)
+            {
+                //GameObject(GameObject, new Vector3(x, 0.0f, y), Quaternion.identity);
+                var gameObject = new GameObject("Node" + letter);
+                gameObject.tag = "Node" + letter;
+
+                BoxCollider nodeCollider = gameObject.AddComponent<BoxCollider>();
+                nodeCollider.size = new Vector3(.4f, 0.5f, .4f);
+                nodeCollider.isTrigger = true;
+
+                gameObject.transform.position = new Vector3(x * .5f - 25, 0.32f, y * .5f - 25);
+                gameObject.transform.parent = nodeParent.transform;
+                var node = gameObject.AddComponent<AStarNode>();
+
+                nodeArray[x, y] = node;
+                node.unWalkable = false;
+            }
+        }
+
+        for (int y = 0; y < gridDepth; y++)
+        {
+            for (int x = 0; x < gridWidth - 1; x++)
+            {
+                var currentNode = nodeArray[x, y];
+                var nextNode = nodeArray[x + 1, y];
+
+                currentNode.connections.Add(nextNode);
+                nextNode.connections.Add(currentNode);
+            }
+        }
+
+        for (int y = 0; y < gridDepth - 1; y++)
+        {
+            for (int x = 0; x < gridWidth; x++)
+            {
+                var currentNode = nodeArray[x, y];
+                var nextNode = nodeArray[x, y + 1];
+
+                currentNode.connections.Add(nextNode);
+                nextNode.connections.Add(currentNode);
+            }
         }
     }
 }
