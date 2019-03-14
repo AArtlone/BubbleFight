@@ -60,18 +60,17 @@ public class VisionCone : MonoBehaviour
             // Depending on the scale of the game and the unique objects with tags
             // replace this code block of if-s with a switch statement instead!
             //Debug.Log(hitObject.tag + " | " + hitObject.name);
-            if (hitObject.tag == "Wall")
+            if (hitObject.tag == "Obstacle")
             {
-                Debug.DrawLine(agentPosition, targetPosition, Color.red);
+                //Debug.DrawLine(agentPosition, targetPosition, Color.red);
                 Obstacle = hitObject;
                 return;
-            } else { 
-}
+            }
 
             if (hitObject.tag == TargetToLookFor)
             {
                 Target = hitObject;
-                Debug.DrawLine(agentPosition, targetPosition, Color.black);
+                //Debug.DrawLine(agentPosition, targetPosition, Color.black);
             }
         }
     }

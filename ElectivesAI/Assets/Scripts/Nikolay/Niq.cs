@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 
 public class Niq : MonoBehaviour
 {
@@ -8,6 +9,8 @@ public class Niq : MonoBehaviour
     private AStarPath _AStarPath;
     private AStarNodeDetector _nodeDetector;
     private GameObject _nodeGrid;
+    private bool _lookForNewTarget = true;
+    public LayerMask NodeMask;
 
     // Depending on the player's stats and circumstances, different states will
     // be toggled triggering different behaviour.
@@ -25,6 +28,7 @@ public class Niq : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(_eyes.Target);
         if (_tankInterface.GetHealth() < 10 ||
             _tankInterface.GetAmmo() <= 0)
         {
@@ -36,7 +40,7 @@ public class Niq : MonoBehaviour
         
         if (_currentState != TankState.Evasive)
         {
-            if (_eyes.Target != null)
+            if (_eyes.Target.tag == "Tank")
             {
                 _currentState = TankState.Combat;
             }
@@ -56,7 +60,12 @@ public class Niq : MonoBehaviour
             case TankState.Combat:
                 if (_eyes.DistanceToTarget > _tankInterface.GetFireRange())
                 {
-                    ChaseTarget("Tank");
+                    if (_lookForNewTarget)
+                    {
+                        ChaseTarget("Tank");
+                        Invoke("EnableLookingForTarget", 0.2f);
+                        _lookForNewTarget = false;
+                    }
                 } else
                 {
                     _tankInterface.RotateTurret(_eyes.Target.transform);
@@ -65,10 +74,15 @@ public class Niq : MonoBehaviour
                 }
                 break;
             case TankState.Wandering:
-                _tankInterface.ResetTurretRotation();
+                //_tankInterface.ResetTurretRotation();
                 break;
             case TankState.Evasive:
-                ChaseTarget("Ammo Pickup");
+                if (_lookForNewTarget)
+                {
+                    ChaseTarget("Ammo Pickup");
+                    Invoke("EnableLookingForTarget", 0.2f);
+                    _lookForNewTarget = false;
+                }
                 if (_eyes.Target != null)
                 {
                     _tankInterface.RotateTurret(_eyes.Target.transform);
@@ -79,34 +93,30 @@ public class Niq : MonoBehaviour
 
     private void ChaseTarget(string tag)
     {
+       
         _eyes.TargetToLookFor = tag;
-        if (_eyes.Target != null && _eyes.Target.gameObject.tag == tag)
+        if (_eyes.Target.gameObject.tag == tag)
         {
-            GameObject node = _nodeGrid.transform.GetChild(0).gameObject;
-            float closestNodeDistance =
-                Vector3.Distance(
-                    _eyes.Target.transform.position,
-                    node.transform.position);
+            Vector3 targetPosition = _eyes.Target.transform.position;
+            Vector3 direction = targetPosition - transform.position;
+            float length = direction.magnitude;
+            direction.Normalize();
 
-            for (int i = 0; i < _nodeGrid.transform.childCount; i++)
-            {
-                GameObject currentNode = _nodeGrid.transform.GetChild(i).gameObject;
+            Ray ray = new Ray(transform.position, direction);
+            RaycastHit[] hits = Physics.RaycastAll(ray, length, NodeMask);
 
-                float currentNodeToEnemyDistance = Vector3.Distance(
-                        _eyes.Target.transform.position,
-                        currentNode.transform.position);
-
-                if (closestNodeDistance > currentNodeToEnemyDistance)
-                {
-                    closestNodeDistance = currentNodeToEnemyDistance;
-                    node = currentNode;
-                }
-            }
+            GameObject node = hits[hits.Length - 1].transform.gameObject;
 
             _AStarPath.startNode = _nodeDetector.CurrentNode;
             _AStarPath.endNode = node.GetComponent<AStarNode>();
             _nodeDetector.CurrentNodeIndexInPath = 1;
             _nodeDetector.PathOfTank = _AStarPath.FindShortestPath();
         }
+        
+    }
+
+    private void EnableLookingForTarget()
+    {
+        _lookForNewTarget = true;
     }
 }

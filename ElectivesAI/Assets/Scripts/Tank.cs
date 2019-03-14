@@ -13,7 +13,7 @@ public class Tank : MonoBehaviour
     private bool _isTurretRotated = true;
 
     #region Shooting mechanic variables
-    private int _ammo = 2;
+    private int _ammo = 100;
     private const float _fireRate = 1;
     private bool _canShoot = true;
     #endregion
@@ -201,8 +201,8 @@ public class Tank : MonoBehaviour
     private void GenerateGrid(string letter)
     {
         var nodeParent = new GameObject("NodeList" + letter);
-        int gridDepth = 100;
-        int gridWidth = 100;
+        int gridDepth = 26;
+        int gridWidth = 26;
 
         var nodeArray = new AStarNode[gridDepth, gridWidth];
         for (int y = 0; y < gridDepth; y++)
@@ -212,12 +212,16 @@ public class Tank : MonoBehaviour
                 //GameObject(GameObject, new Vector3(x, 0.0f, y), Quaternion.identity);
                 var gameObject = new GameObject("Node" + letter);
                 gameObject.tag = "Node" + letter;
+                if (letter == "N")
+                {
+                    gameObject.layer = 9;
+                }
 
                 BoxCollider nodeCollider = gameObject.AddComponent<BoxCollider>();
-                nodeCollider.size = new Vector3(.4f, 0.5f, .4f);
+                nodeCollider.size = new Vector3(1.9f, 0.5f, 1.9f);
                 nodeCollider.isTrigger = true;
 
-                gameObject.transform.position = new Vector3(x * .5f - 25, 0.32f, y * .5f - 25);
+                gameObject.transform.position = new Vector3(x * 2f - 25, 0.32f, y * 2f - 25);
                 gameObject.transform.parent = nodeParent.transform;
                 var node = gameObject.AddComponent<AStarNode>();
 

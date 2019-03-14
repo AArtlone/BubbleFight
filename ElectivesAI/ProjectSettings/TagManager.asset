@@ -5,12 +5,12 @@ TagManager:
   serializedVersion: 2
   tags:
   - Tank
-  - Wall
   - Ammo Pickup
   - NodeN
   - NodeA
   - NodeD
   - NodeY
+  - Obstacle
   layers:
   - Default
   - TransparentFX
@@ -21,7 +21,7 @@ TagManager:
   - 
   - 
   - PostProcessing
-  - 
+  - Node
   - 
   - 
   - 
