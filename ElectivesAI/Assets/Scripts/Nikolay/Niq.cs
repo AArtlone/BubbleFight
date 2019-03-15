@@ -95,7 +95,7 @@ public class Niq : MonoBehaviour
                 {
                     if (_nodeDetector.CurrentNode == _AStarPath.endNode || _initializeWandering)
                     {
-                        Debug.Log("New Node");
+                        //Debug.Log("New Node");
                         int randomIndexNodeInGrid = Random.Range(0, _nodeGrid.transform.childCount - 1);
                         AStarNode randomNode = _nodeGrid.transform.GetChild(randomIndexNodeInGrid).GetComponent<AStarNode>();
 
@@ -153,31 +153,34 @@ public class Niq : MonoBehaviour
                     _eyes.Target = null;
                 }
             }
-            
-            if (_eyes.Target.tag == "Ammo Pickup" && _nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
-            {
-                _tankInterface.MoveTheTank("Forward");
 
-                _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
-            }
-            
-            if (_eyes.Target.tag == "Tank" && _isWallInBetween == false)
+            if (_eyes.Target != null)
             {
-                if (_nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
+                if (_eyes.Target.tag == "Ammo Pickup" && _nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
                 {
-                    if (_eyes.DistanceToTarget > _tankInterface.GetFireRange())
-                    {
-                        _tankInterface.MoveTheTank("Forward");
+                    _tankInterface.MoveTheTank("Forward");
 
-                        _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
-                    }
-                    else
+                    _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+                }
+
+                if (_eyes.Target.tag == "Tank" && _isWallInBetween == false)
+                {
+                    if (_nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
                     {
-                        if (_isWallInBetween)
+                        if (_eyes.DistanceToTarget > _tankInterface.GetFireRange())
                         {
                             _tankInterface.MoveTheTank("Forward");
 
                             _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+                        }
+                        else
+                        {
+                            if (_isWallInBetween)
+                            {
+                                _tankInterface.MoveTheTank("Forward");
+
+                                _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+                            }
                         }
                     }
                 }

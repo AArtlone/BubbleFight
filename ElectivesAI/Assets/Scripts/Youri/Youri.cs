@@ -1,5 +1,4 @@
 ﻿using UnityEngine;
-using System.Collections.Generic;
 
 public class Youri : MonoBehaviour
 {
@@ -11,7 +10,7 @@ public class Youri : MonoBehaviour
     private GameObject _nodeGrid;
     private bool _lookForNewTarget = true;
     public LayerMask NodeMask;
-    private float RotateSpeedScan = 40;
+    private bool _isFirstPathInitialized = false;
 
     private enum TankState
     {
@@ -39,29 +38,64 @@ public class Youri : MonoBehaviour
             if (_eyes.Target.tag == "Tank")
             {
                 tankBehaviour = TankState.Fight;
-                Debug.Log("BackToFighting");
+                //Debug.Log("BackToFighting");
             }
-            else
-            {
-                tankBehaviour = TankState.Patrol;
-                Debug.Log("DontSeeAnythingBoss");
-            }
+        }
+        else
+        {
+            tankBehaviour = TankState.Patrol;
+            //Debug.Log("DontSeeAnythingBoss");
         }
 
         switch (tankBehaviour)
         {
             case TankState.Fight:
-                _tankInterface.RotateTurret(_eyes.Target.transform);
+                if (_eyes.Target != null)
+                {
+                    _tankInterface.RotateTurret(_eyes.Target.transform);
+                }
 
                 Invoke("Shoot", 0.3f);
                 break;
 
             case TankState.Alerted:
-                transform.parent.Rotate(new Vector3(0, 0.5f, 0));
+                transform.parent.Rotate(new Vector3(0, _tankInterface.RotationSpeed * Time.deltaTime, 0));
                 break;
 
             case TankState.Patrol:
 
+                if (_isFirstPathInitialized == false)
+                {
+                    int randomNodeFromGrid = Random.Range(0, _nodeGrid.transform.childCount - 1);
+
+                    GameObject node = _nodeGrid.transform.GetChild(randomNodeFromGrid).gameObject;
+
+                    while (node.GetComponent<AStarNode>().unWalkable == true)
+                    {
+                        randomNodeFromGrid = Random.Range(0, _nodeGrid.transform.childCount - 1);
+
+                        node = _nodeGrid.transform.GetChild(randomNodeFromGrid).gameObject;
+                    }
+
+                    CreateRandomPath(node);
+                    _isFirstPathInitialized = true;
+                }
+
+                if (_nodeDetector.CurrentNode == _AStarPath.endNode)
+                {
+                    int randomNodeFromGrid = Random.Range(0, _nodeGrid.transform.childCount - 1);
+
+                    GameObject node = _nodeGrid.transform.GetChild(randomNodeFromGrid).gameObject;
+
+                    while (node.GetComponent<AStarNode>().unWalkable == true)
+                    {
+                        randomNodeFromGrid = Random.Range(0, _nodeGrid.transform.childCount - 1);
+
+                        node = _nodeGrid.transform.GetChild(randomNodeFromGrid).gameObject;
+                    }
+
+                    CreateRandomPath(node);
+                }
                 break;
         }
 
@@ -73,27 +107,36 @@ public class Youri : MonoBehaviour
         //Patrol
         //The usual state the tank is in when no enemy is found, heath is not below a certain level and you're not currently being shot at.
         //Walk around the area until a tank enters the line of sight or until being hit by an opposing tank
+        if (_nodeDetector.CurrentNode != _AStarPath.endNode)
+        {
+            _tankInterface.MoveTheTank("Forward");
 
-        //Alerted
-        //Shift to this state when the tank is being damaged by a bullet without any tanks being in the vision cone of the tank
-        //rotate the tank to find the enemy as soon as possible to fire back
+            // Since we return the path from the end to the start, the index is 
+            // being calculated so that we get the index from the start to the end instead.
+            _tankInterface.RotateTheTank(
+                _nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+        }
+
+            //Alerted
+            //Shift to this state when the tank is being damaged by a bullet without any tanks being in the vision cone of the tank
+            //rotate the tank to find the enemy as soon as possible to fire back
     }
 
     void OnTriggerEnter(Collider other)
     {
         if (other.tag == "Bullet" && _eyes.Target == null)
         {
-            Debug.Log("Alerted");
+            //Debug.Log("Alerted");
             tankBehaviour = TankState.Alerted;
         }
         else if (other.tag == "Bullet" && _eyes.Target.tag == "Tank" && _tankInterface.GetHealth() > 4)
         {
-            Debug.Log("Fight");
+            //Debug.Log("Fight");
             tankBehaviour = TankState.Fight;
         }
         else if (other.tag == "Bullet" && _eyes.Target.tag == "Tank" && _tankInterface.GetHealth() <= 4)
         {
-            Debug.Log("Run");
+            //Debug.Log("Run");
             tankBehaviour = TankState.Run;
         }
     }
@@ -104,5 +147,24 @@ public class Youri : MonoBehaviour
     void Shoot()
     {
         _tankInterface.Shoot();
+    }
+
+    private void CreateRandomPath(GameObject randomNode)
+    {
+        Vector3 targetPosition = randomNode.transform.position;
+        Vector3 direction = targetPosition - transform.position;
+        float length = direction.magnitude;
+
+        direction.Normalize();
+
+        Ray ray = new Ray(transform.position, direction);
+        RaycastHit[] hits = Physics.RaycastAll(ray, length, NodeMask);
+
+        GameObject node = hits[hits.Length - 1].transform.gameObject;
+
+        _AStarPath.startNode = _nodeDetector.CurrentNode;
+        _AStarPath.endNode = node.GetComponent<AStarNode>();
+        _nodeDetector.CurrentNodeIndexInPath = 1;
+        _nodeDetector.PathOfTank = _AStarPath.FindShortestPath();
     }
 }
