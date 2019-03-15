@@ -17,6 +17,8 @@ public class VisionCone : MonoBehaviour
     public string TargetToLookFor = "Tank";
     #endregion
 
+    public Vector3 LastSeenDestination;
+
     void Start()
     {
         if (_agent == null)
@@ -72,6 +74,18 @@ public class VisionCone : MonoBehaviour
                 Target = hitObject;
                 //Debug.DrawLine(agentPosition, targetPosition, Color.black);
             }
+        }
+    }
+
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.tag == TargetToLookFor) {
+            Target = null;
+        }
+        if (other.gameObject.name == "Node Detector")
+        {
+            LastSeenDestination = other.gameObject.transform.parent.position;
+            Debug.Log(LastSeenDestination);
         }
     }
 }
