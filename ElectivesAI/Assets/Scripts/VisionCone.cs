@@ -89,7 +89,7 @@ public class VisionCone : MonoBehaviour
         if (other.gameObject.name == "Node Detector")
         {
             LastSeenDestination = other.gameObject.transform.parent.position;
-            Debug.Log(LastSeenDestination);
+            //Debug.Log(LastSeenDestination);
         }
     }
 }

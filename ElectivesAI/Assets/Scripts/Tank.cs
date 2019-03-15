@@ -7,7 +7,7 @@ public class Tank : MonoBehaviour
     private int _health = 10;
 
     private const float _movementSpeed = 250f;
-    private const float _rotationSpeed = 100f;
+    public readonly float RotationSpeed = 100f;
     private const float _turretRotationSpeed = 5f;
     private Vector3 _turretStartRotation;
     private bool _isTurretRotated = true;
@@ -77,7 +77,7 @@ public class Tank : MonoBehaviour
 
         // It will slowly turn the player to the new direction it has to
         // look towards.
-        transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, _rotationSpeed * Time.deltaTime);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, newRotation, RotationSpeed * Time.fixedDeltaTime);
     }
 
     // Rotates the turret towards a specified object's transform.
@@ -85,7 +85,7 @@ public class Tank : MonoBehaviour
     {
         Vector3 targetDir = objectToRotateTowards.position - _turret.transform.position;
 
-        Vector3 newDir = Vector3.RotateTowards(_turret.transform.forward, targetDir, _turretRotationSpeed * Time.deltaTime, 0.0f);
+        Vector3 newDir = Vector3.RotateTowards(_turret.transform.forward, targetDir, _turretRotationSpeed * Time.fixedDeltaTime, 0.0f);
         
         _turret.transform.rotation = Quaternion.LookRotation(newDir);
     }
@@ -94,7 +94,7 @@ public class Tank : MonoBehaviour
     // target to look at.
     public void ResetTurretRotation()
     {
-        Vector3 newDir = Vector3.RotateTowards(_turret.transform.forward, _turretStartRotation, _turretRotationSpeed * Time.deltaTime, 0.0f);
+        Vector3 newDir = Vector3.RotateTowards(_turret.transform.forward, _turretStartRotation, _turretRotationSpeed * Time.fixedDeltaTime, 0.0f);
 
         _turret.transform.rotation = Quaternion.LookRotation(newDir);
     }
@@ -145,7 +145,7 @@ public class Tank : MonoBehaviour
             Physics.IgnoreCollision(bullet.GetComponent<Collider>(), CannonHead.GetComponent<Collider>());
 
             // Adding force to the bullet
-            bullet.GetComponent<Rigidbody>().AddForce(shootingPos.forward * _bulletSpeed * 200 * Time.deltaTime);
+            bullet.GetComponent<Rigidbody>().AddForce(shootingPos.forward * _bulletSpeed * 200 * Time.fixedDeltaTime);
 
             // We stop the player from shooting twice in order to emulate
             // the projectiles being loaded in after a moment depending on
@@ -168,7 +168,7 @@ public class Tank : MonoBehaviour
     // that it does not go on forever.
     private IEnumerator DestroyBullet(GameObject bullet)
     {
-        yield return new WaitForSeconds(1f);
+        yield return new WaitForSeconds(4f);
         Destroy(bullet);
     }
     #endregion

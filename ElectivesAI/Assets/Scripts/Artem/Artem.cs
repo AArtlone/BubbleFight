@@ -110,8 +110,8 @@ public class Artem : MonoBehaviour
 
     private void MovingTank()
     {
-        if(_currentTankState == TankState.movingTowardsANode && 
-            _aStarNodeDetector.CurrentNodeIndexInPath < _aStarNodeDetector.PathOfTank.Count)
+        if(_currentTankState == TankState.movingTowardsANode &&
+            _aStarNodeDetector.CurrentNode != _aStarPath.endNode)
         {
             _tankInterface.RotateTheTank(_aStarNodeDetector.PathOfTank
                 [_aStarNodeDetector.PathOfTank.Count - 1 - _aStarNodeDetector.CurrentNodeIndexInPath]

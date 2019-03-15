@@ -90,7 +90,7 @@ public class Diego : MonoBehaviour
 
             GameObject node = hits[hits.Length - 1].transform.gameObject;
 
-            Debug.Log(node);
+            //Debug.Log(node);
             aStarPath.startNode = aNodeDetector.CurrentNode;
             aStarPath.endNode = node.GetComponent<AStarNode>();
             aNodeDetector.CurrentNodeIndexInPath = 1;
