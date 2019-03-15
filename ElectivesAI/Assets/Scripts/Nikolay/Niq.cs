@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class Niq : MonoBehaviour
@@ -24,6 +24,8 @@ public class Niq : MonoBehaviour
         _eyes = transform.parent.GetComponentInChildren<VisionCone>();
         _AStarPath = transform.parent.GetComponentInChildren<AStarPath>();
         _nodeDetector = transform.parent.GetComponentInChildren<AStarNodeDetector>();
+
+
     }
 
     private void Update()
@@ -70,7 +72,7 @@ public class Niq : MonoBehaviour
                 {
                     _tankInterface.RotateTurret(_eyes.Target.transform);
 
-                    _tankInterface.Shoot();
+                    Invoke("Shoot", 2f);
                 }
                 break;
             case TankState.Wandering:
@@ -91,9 +93,33 @@ public class Niq : MonoBehaviour
         }
     }
 
+    private void FixedUpdate()
+    {
+        // We check if the tank is close enough to its target and if so, we 
+        // stop moving and target to fire, otherwise we continue chasing it.
+        if (_eyes.Target != null)
+        {
+            if (_eyes.Target.tag == "Ammo Pickup" && _nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
+            {
+                _tankInterface.MoveTheTank("Forward");
+
+                _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+            }
+
+            if (_eyes.Target.tag == "Tank")
+            {
+                if (_eyes.DistanceToTarget > _tankInterface.GetFireRange() && _nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
+                {
+                    _tankInterface.MoveTheTank("Forward");
+
+                    _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+                }
+            }
+        }
+    }
+
     private void ChaseTarget(string tag)
     {
-       
         _eyes.TargetToLookFor = tag;
         if (_eyes.Target.gameObject.tag == tag)
         {
@@ -118,5 +144,10 @@ public class Niq : MonoBehaviour
     private void EnableLookingForTarget()
     {
         _lookForNewTarget = true;
+    }
+
+    private void Shoot()
+    {
+        _tankInterface.Shoot();
     }
 }

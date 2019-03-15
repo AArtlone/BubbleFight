@@ -34,31 +34,6 @@ public class AStarNodeDetector : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
-    {
-        // We check if the tank is close enough to its target and if so, we 
-        // stop moving and target to fire, otherwise we continue chasing it.
-        if (_eyes.Target != null)
-        {
-            if (_eyes.Target.tag == "Ammo Pickup" && CurrentNodeIndexInPath < PathOfTank.Count)
-            {
-                _tankInterface.MoveTheTank("Forward");
-
-                _tankInterface.RotateTheTank(PathOfTank[PathOfTank.Count - 1 - CurrentNodeIndexInPath].transform);
-            }
-
-            if (_eyes.Target.tag == "Tank")
-            {
-                if (_eyes.DistanceToTarget > _tankInterface.GetFireRange() && CurrentNodeIndexInPath < PathOfTank.Count)
-                {
-                    _tankInterface.MoveTheTank("Forward");
-
-                    _tankInterface.RotateTheTank(PathOfTank[PathOfTank.Count - 1 - CurrentNodeIndexInPath].transform);
-                }
-            }
-        }
-    }
-
     private void OnTriggerStay(Collider other)
     {
         if (other.gameObject.tag == "Node" + _lastLetter)
