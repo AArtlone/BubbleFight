@@ -15,29 +15,21 @@ public class Diego : MonoBehaviour
     private bool lookForTarget = true;
     public LayerMask NodeMask;
 
-
     private void Start()
     {
         tankInterface = GetComponent<Tank>();
-        nodeGrid = GameObject.Find("NodeListN");
+        
         vision = transform.parent.GetComponentInChildren<VisionCone>();
         aStarPath = transform.parent.GetComponentInChildren<AStarPath>();
         aNodeDetector = transform.parent.GetComponentInChildren<AStarNodeDetector>();
-
+        nodeGrid = GameObject.Find("NodeListD");
     }
 
     private void Update()
     {
         //health
-        if (tankInterface.GetHealth() <= 5 && (state == 0 || state == 2)) {
-            state = 1;
-        }
-
-        if (tankInterface.GetAmmo() <= 0 && (state == 0 || state == 1)) {
-            state = 2;
-        }
-
-        if (state == 0) {
+        if (state == 0)
+        {
             if (vision.DistanceToTarget > tankInterface.GetFireRange())
             {
                 if (lookForTarget)
@@ -46,12 +38,21 @@ public class Diego : MonoBehaviour
                     lookForTarget = false;
                 }
             }
-            else {
+            else if (vision.Target != null)
+            {
                 tankInterface.RotateTurret(vision.Target.transform);
                 tankInterface.Shoot();
             }
         }
+        
+        if (tankInterface.GetHealth()  <= 5 && (state == 0 || state == 2)) {
+            state = 1;
+        }
 
+        if (tankInterface.GetAmmo() <= 0 && (state == 0 || state == 1)) {
+            state = 2;
+        }
+        
         if (state == 1)
         {
             if (lookForTarget)
@@ -60,7 +61,6 @@ public class Diego : MonoBehaviour
                 lookForTarget = false;
             }
         }
-
         if (state == 2)
         {
             if (lookForTarget)
@@ -72,6 +72,7 @@ public class Diego : MonoBehaviour
     }
 
     private void FollowPlayer(string pTarget) {
+
         vision.TargetToLookFor = pTarget;
         if (vision.Target.gameObject.tag == pTarget)
         {
@@ -79,29 +80,27 @@ public class Diego : MonoBehaviour
             Vector3 direction = targetPosition - transform.position;
             float length = direction.magnitude;
             direction.Normalize();
+
             Ray ray = new Ray(transform.position, direction);
             RaycastHit[] hits = Physics.RaycastAll(ray, length, NodeMask);
 
             GameObject node = hits[hits.Length - 1].transform.gameObject;
 
+            Debug.Log(node);
             aStarPath.startNode = aNodeDetector.CurrentNode;
             aStarPath.endNode = node.GetComponent<AStarNode>();
             aNodeDetector.CurrentNodeIndexInPath = 1;
             aNodeDetector.PathOfTank = aStarPath.FindShortestPath();
-
         }
-
     }
-
+    
     private void GetDirectionVector(){
         
     }
-
     private void EnableLookingForTarget()
     {
         lookForTarget = true;
     }
-
     private void FixedUpdate()
     {
 
