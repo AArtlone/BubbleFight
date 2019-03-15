@@ -177,7 +177,7 @@ public class Tank : MonoBehaviour
     // and damages the tank, potentially destroying it.
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Bullet")
+        if(other.transform.tag == "Bullet")
         {
             _health--;
 
@@ -189,7 +189,7 @@ public class Tank : MonoBehaviour
             Destroy(other.gameObject);
         }
 
-        if (other.tag == "Ammo Pickup")
+        if (other.transform.tag == "Ammo Pickup")
         {
             _ammo += 5;
             _eyes.Target = null;

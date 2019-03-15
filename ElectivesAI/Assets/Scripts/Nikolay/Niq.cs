@@ -11,7 +11,9 @@ public class Niq : MonoBehaviour
     private GameObject _nodeGrid;
     private bool _lookForNewTarget = true;
     public LayerMask NodeMask;
-    private bool isWallInBetween = false;
+    private bool _isWallInBetween = false;
+    private bool _isDestinationReached = true;
+    private bool _initializeWandering = true;
 
     // Depending on the player's stats and circumstances, different states will
     // be toggled triggering different behaviour.
@@ -25,10 +27,13 @@ public class Niq : MonoBehaviour
         _eyes = transform.parent.GetComponentInChildren<VisionCone>();
         _AStarPath = transform.parent.GetComponentInChildren<AStarPath>();
         _nodeDetector = transform.parent.GetComponentInChildren<AStarNodeDetector>();
+
+        _nodeDetector.CurrentNode = _AStarPath.endNode;
     }
 
     private void Update()
     {
+        //Debug.Log(_isDestinationReached);
         //Debug.Log(_eyes.Target);
         if (_tankInterface.GetHealth() < 10 ||
             _tankInterface.GetAmmo() <= 0)
@@ -56,11 +61,11 @@ public class Niq : MonoBehaviour
         
         //Debug.Log(_tankInterface.GetHealth());
         //Debug.Log(_eyes.Target);
-        Debug.Log(_currentState);
+        //Debug.Log(_currentState);
         switch (_currentState)
         {
             case TankState.Combat:
-                if (_eyes.Target != null && isWallInBetween == false)
+                if (_eyes.Target != null && _isWallInBetween == false)
                 {
                     _tankInterface.RotateTurret(_eyes.Target.transform);
                 }
@@ -74,7 +79,7 @@ public class Niq : MonoBehaviour
                     }
                 } else
                 {
-                    if (isWallInBetween == false)
+                    if (_isWallInBetween == false)
                     {
                         _tankInterface.RotateTurret(_eyes.Target.transform);
 
@@ -83,16 +88,39 @@ public class Niq : MonoBehaviour
                 }
                 break;
             case TankState.Wandering:
-                MoveToDestination(_eyes.LastSeenDestination);
+                if (_isDestinationReached == false)
+                {
+                    MoveToDestination(_eyes.LastSeenDestination);
+                } else
+                {
+                    if (_nodeDetector.CurrentNode == _AStarPath.endNode || _initializeWandering)
+                    {
+                        Debug.Log("New Node");
+                        int randomIndexNodeInGrid = Random.Range(0, _nodeGrid.transform.childCount - 1);
+                        AStarNode randomNode = _nodeGrid.transform.GetChild(randomIndexNodeInGrid).GetComponent<AStarNode>();
+
+                        while (randomNode.unWalkable == true)
+                        {
+                            randomIndexNodeInGrid = Random.Range(0, _nodeGrid.transform.childCount - 1);
+
+                            randomNode = _nodeGrid.transform.GetChild(randomIndexNodeInGrid).GetComponent<AStarNode>();
+                        }
+
+                        Vector3 randomNodePosition = _nodeGrid.transform.GetChild(randomIndexNodeInGrid).position;
+
+                        MoveToDestination(randomNodePosition);
+                        _initializeWandering = false;
+                    }
+                }
                 break;
-            case TankState.Evasive:
+            case TankState.Evasive: // WORK IN PROGRESS
                 if (_lookForNewTarget)
                 {
                     ChaseTarget("Ammo Pickup");
                     Invoke("EnableLookingForTarget", 0.2f);
                     _lookForNewTarget = false;
                 }
-                if (_eyes.Target != null && isWallInBetween == false)
+                if (_eyes.Target != null && _isWallInBetween == false)
                 {
                     _tankInterface.RotateTurret(_eyes.Target.transform);
                 }
@@ -102,7 +130,7 @@ public class Niq : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Debug.Log(_eyes.Target);
+        //Debug.Log(_eyes.Target);
         // We check if the tank is close enough to its target and if so, we 
         // stop moving and target to fire, otherwise we continue chasing it.
         if (_eyes.Target != null)
@@ -115,44 +143,41 @@ public class Niq : MonoBehaviour
             Ray ray = new Ray(transform.position, direction);
             RaycastHit[] hits = Physics.RaycastAll(ray, length);
 
-            isWallInBetween = false;
+            _isWallInBetween = false;
             for (int i = 0; i < hits.Length; i++)
             {
                 if (hits[i].transform.tag == "Obstacle")
                 {
                     Debug.DrawLine(transform.position, targetPosition, Color.cyan);
-                    isWallInBetween = true;
+                    _isWallInBetween = true;
                     _eyes.Target = null;
                 }
             }
-
-            if (_eyes.Target != null)
+            
+            if (_eyes.Target.tag == "Ammo Pickup" && _nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
             {
-                if (_eyes.Target.tag == "Ammo Pickup" && _nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
-                {
-                    _tankInterface.MoveTheTank("Forward");
+                _tankInterface.MoveTheTank("Forward");
 
-                    _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
-                }
-
-                if (_eyes.Target.tag == "Tank")
+                _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+            }
+            
+            if (_eyes.Target.tag == "Tank" && _isWallInBetween == false)
+            {
+                if (_nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
                 {
-                    if (_nodeDetector.CurrentNodeIndexInPath < _nodeDetector.PathOfTank.Count)
+                    if (_eyes.DistanceToTarget > _tankInterface.GetFireRange())
                     {
-                        if (_eyes.DistanceToTarget > _tankInterface.GetFireRange())
+                        _tankInterface.MoveTheTank("Forward");
+
+                        _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+                    }
+                    else
+                    {
+                        if (_isWallInBetween)
                         {
                             _tankInterface.MoveTheTank("Forward");
 
                             _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
-                        }
-                        else
-                        {
-                            if (isWallInBetween)
-                            {
-                                _tankInterface.MoveTheTank("Forward");
-
-                                _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
-                            }
                         }
                     }
                 }
@@ -160,9 +185,15 @@ public class Niq : MonoBehaviour
         }
         else
         {
+            if (_nodeDetector.CurrentNode != _AStarPath.endNode)
+            {
                 _tankInterface.MoveTheTank("Forward");
 
                 _tankInterface.RotateTheTank(_nodeDetector.PathOfTank[_nodeDetector.PathOfTank.Count - 1 - _nodeDetector.CurrentNodeIndexInPath].transform);
+            } else
+            {
+                _isDestinationReached = true;
+            }
         }
     }
 
@@ -190,7 +221,6 @@ public class Niq : MonoBehaviour
 
     private void MoveToDestination(Vector3 oldPosition)
     {
-        Debug.Log(oldPosition);
         Vector3 targetPosition = oldPosition;
         Vector3 direction = targetPosition - transform.position;
         float length = direction.magnitude;
@@ -205,7 +235,6 @@ public class Niq : MonoBehaviour
         _AStarPath.endNode = node.GetComponent<AStarNode>();
         _nodeDetector.CurrentNodeIndexInPath = 1;
         _nodeDetector.PathOfTank = _AStarPath.FindShortestPath();
-        Debug.Log(_nodeDetector.PathOfTank.Count);
     }
 
     private void EnableLookingForTarget()
