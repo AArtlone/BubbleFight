@@ -212,7 +212,22 @@ public class Tank : MonoBehaviour
                 //GameObject(GameObject, new Vector3(x, 0.0f, y), Quaternion.identity);
                 var gameObject = new GameObject("Node" + letter);
                 gameObject.tag = "Node" + letter;
-                gameObject.layer = 9;
+
+                switch(letter)
+                {
+                    case "N":
+                        gameObject.layer = 9;
+                        break;
+                    case "A":
+                        gameObject.layer = 10;
+                        break;
+                    case "D":
+                        gameObject.layer = 11;
+                        break;
+                    case "Y":
+                        gameObject.layer = 12;
+                        break;
+                }
 
                 BoxCollider nodeCollider = gameObject.AddComponent<BoxCollider>();
                 nodeCollider.size = new Vector3(1.9f, 0.5f, 1.9f);
