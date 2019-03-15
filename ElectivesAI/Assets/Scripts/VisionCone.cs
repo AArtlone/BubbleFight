@@ -82,6 +82,10 @@ public class VisionCone : MonoBehaviour
         if (other.gameObject.tag == TargetToLookFor) {
             Target = null;
         }
+        if (other.gameObject.tag == "Obstacle")
+        {
+            Obstacle = null;
+        }
         if (other.gameObject.name == "Node Detector")
         {
             LastSeenDestination = other.gameObject.transform.parent.position;
