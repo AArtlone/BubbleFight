@@ -22,27 +22,31 @@ public class Diego : MonoBehaviour
         vision = transform.parent.GetComponentInChildren<VisionCone>();
         aStarPath = transform.parent.GetComponentInChildren<AStarPath>();
         aNodeDetector = transform.parent.GetComponentInChildren<AStarNodeDetector>();
+        aNodeDetector.CurrentNode = aStarPath.endNode;
         nodeGrid = GameObject.Find("NodeListD");
     }
 
     private void Update()
     {
         //health
-        if (state == 0)
+        if (state == 0) //offensive state
         {
-            if (vision.DistanceToTarget > tankInterface.GetFireRange())
+            if (vision.DistanceToTarget > tankInterface.GetFireRange()) //if distance between tank and target is bigger than fire range
             {
                 if (lookForTarget)
                 {
-                    FollowPlayer("Tank");
-                    lookForTarget = false;
+                    FollowPlayer("Tank"); //finds objects with tank tag
+                    //lookForTarget = false;
                 }
             }
             else if (vision.Target != null)
             {
-                tankInterface.RotateTurret(vision.Target.transform);
+                tankInterface.RotateTurret(vision.Target.transform); //if in range, rotate turret and shoot
                 tankInterface.Shoot();
             }
+        }
+        else {
+            tankInterface.RotateTheTank(gameObject.transform);
         }
         
         if (tankInterface.GetHealth()  <= 5 && (state == 0 || state == 2)) {
@@ -53,7 +57,7 @@ public class Diego : MonoBehaviour
             state = 2;
         }
         
-        if (state == 1)
+        if (state == 1) //not yet implemented
         {
             if (lookForTarget)
             {
@@ -71,14 +75,14 @@ public class Diego : MonoBehaviour
         }
     }
 
-    private void FollowPlayer(string pTarget) {
+    private void FollowPlayer(string pTarget) { 
 
-        vision.TargetToLookFor = pTarget;
-        if (vision.Target.gameObject.tag == pTarget)
+        vision.TargetToLookFor = pTarget; 
+        if (vision.Target.gameObject.tag == pTarget) //if object is tag name Tank
         {
             Vector3 targetPosition = vision.Target.transform.position;
-            Vector3 direction = targetPosition - transform.position;
-            float length = direction.magnitude;
+            Vector3 direction = targetPosition - transform.position; 
+            float length = direction.magnitude; //calculates length of vector
             direction.Normalize();
 
             Ray ray = new Ray(transform.position, direction);
@@ -91,7 +95,15 @@ public class Diego : MonoBehaviour
             aStarPath.endNode = node.GetComponent<AStarNode>();
             aNodeDetector.CurrentNodeIndexInPath = 1;
             aNodeDetector.PathOfTank = aStarPath.FindShortestPath();
+            MoveTank();
         }
+    }
+
+    private void MoveTank()
+    {
+        tankInterface.MoveTheTank("Forward"); //Moves tank forward
+        tankInterface.RotateTheTank(aNodeDetector.PathOfTank[aNodeDetector.PathOfTank.Count - 1 - aNodeDetector.CurrentNodeIndexInPath].transform); //moves tank along nodes 
+
     }
     
     private void GetDirectionVector(){
