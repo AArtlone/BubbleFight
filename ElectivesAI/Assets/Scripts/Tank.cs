@@ -177,7 +177,7 @@ public class Tank : MonoBehaviour
     // and damages the tank, potentially destroying it.
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Bullet")
+        if(other.transform.tag == "Bullet")
         {
             _health--;
 
@@ -189,7 +189,7 @@ public class Tank : MonoBehaviour
             Destroy(other.gameObject);
         }
 
-        if (other.tag == "Ammo Pickup")
+        if (other.transform.tag == "Ammo Pickup")
         {
             _ammo += 5;
             _eyes.Target = null;
@@ -212,10 +212,7 @@ public class Tank : MonoBehaviour
                 //GameObject(GameObject, new Vector3(x, 0.0f, y), Quaternion.identity);
                 var gameObject = new GameObject("Node" + letter);
                 gameObject.tag = "Node" + letter;
-                if (letter == "N")
-                {
-                    gameObject.layer = 9;
-                }
+                gameObject.layer = 9;
 
                 BoxCollider nodeCollider = gameObject.AddComponent<BoxCollider>();
                 nodeCollider.size = new Vector3(1.9f, 0.5f, 1.9f);
