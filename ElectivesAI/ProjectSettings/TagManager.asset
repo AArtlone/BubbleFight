@@ -11,6 +11,7 @@ TagManager:
   - NodeD
   - NodeY
   - Obstacle
+  - Bullet
   layers:
   - Default
   - TransparentFX

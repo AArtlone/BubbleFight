@@ -168,7 +168,7 @@ public class Tank : MonoBehaviour
     // that it does not go on forever.
     private IEnumerator DestroyBullet(GameObject bullet)
     {
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(1f);
         Destroy(bullet);
     }
     #endregion
