@@ -13,6 +13,7 @@ public enum TankState
 {
     movingTowardsANode,
     chasing,
+    runningAway,
     dodging
 }
 
@@ -26,9 +27,10 @@ public class Artem : MonoBehaviour
     private GameObject _nodeGrid;
     private PlayStyle _currentPlayStyle;
     private TankState _currentTankState;
-    public Renderer ground; // reference to the plane
     public GameObject[] _array;
+    public LayerMask NodeMask;
     private bool _hasANodeToMoveTo;
+    private bool _targetToChase;
 
     private void Start()
     {
@@ -60,11 +62,6 @@ public class Artem : MonoBehaviour
 
     private void ChooseRandomNode()
     {
-        GameObject randomNode = _array[Random.Range(0, _array.Length - 1)];
-    }
-
-    private void MoveToRandomPlace()
-    {
         _aStarNodeDetector.PathOfTank = null;
         GameObject randomNode = _array[Random.Range(0, _array.Length - 1)];
         if(randomNode)
@@ -72,21 +69,32 @@ public class Artem : MonoBehaviour
             _aStarPath.startNode = _aStarNodeDetector.CurrentNode;
             _aStarPath.endNode = randomNode.GetComponent<AStarNode>();
             _aStarNodeDetector.PathOfTank = _aStarPath.FindShortestPath();
+            _aStarNodeDetector.CurrentNodeIndexInPath = 1;
             _hasANodeToMoveTo = true;
+            _currentTankState = TankState.movingTowardsANode;
+        }
+    }
+
+    private void GoToTheNode()
+    {
+        if(_hasANodeToMoveTo == false)
+        {
+            ChooseRandomNode();
         }
     }
 
     private void ChooseRandomPlayStyle()
     {
-        int styleToUse = Random.Range(1, 3);
-        if (styleToUse == 1)
-        {
-            _currentPlayStyle = PlayStyle.aggresive;
-        }
-        else if (styleToUse == 2)
-        {
-            _currentPlayStyle = PlayStyle.passive;
-        }
+        _currentPlayStyle = PlayStyle.aggresive;
+        //int styleToUse = Random.Range(1, 3);
+        //if (styleToUse == 1)
+        //{
+        //    _currentPlayStyle = PlayStyle.aggresive;
+        //}
+        //else if (styleToUse == 2)
+        //{
+        //    _currentPlayStyle = PlayStyle.passive;
+        //}
     }
 
     private void SwitchPlayStyle(int playStyleToUse)
@@ -102,72 +110,77 @@ public class Artem : MonoBehaviour
 
     private void MovingTank()
     {
-        if(_hasANodeToMoveTo && _aStarNodeDetector.CurrentNodeIndexInPath < _aStarNodeDetector.PathOfTank.Count)
+        if(_currentTankState == TankState.movingTowardsANode && 
+            _aStarNodeDetector.CurrentNodeIndexInPath < _aStarNodeDetector.PathOfTank.Count)
         {
-            _tankInterface.MoveTheTank("Forward");
-
             _tankInterface.RotateTheTank(_aStarNodeDetector.PathOfTank
                 [_aStarNodeDetector.PathOfTank.Count - 1 - _aStarNodeDetector.CurrentNodeIndexInPath]
                 .transform);
+
+            Invoke("MoveTankDelay", 1f);
         }
-        if(_eyes.Target)
+        else if (_aStarNodeDetector.CurrentNode == _aStarPath.endNode)
         {
-            Debug.Log(_eyes.Target.name);
+            _hasANodeToMoveTo = false;
+            GoToTheNode();
         }
-        if (_eyes.Obstacle)
+        if (_currentTankState == TankState.chasing)
         {
-            Debug.Log(_eyes.Obstacle.name);
+            _tankInterface.RotateTheTank(_eyes.Target.transform);
+            _tankInterface.MoveTheTank("Forward");
+            float distance = (_eyes.Target.transform.position - transform.position).magnitude;
+            if (distance <= _tankInterface.GetFireRange())
+            {
+                _tankInterface.Shoot();
+            }
         }
-        if (Input.GetKeyDown(KeyCode.L))
+        if (_currentTankState == TankState.runningAway)
         {
-            MoveToRandomPlace();
+            _tankInterface.RotateTheTank(_eyes.Target.transform);
+            _tankInterface.MoveTheTank("Backward");
+            float distance = (_eyes.Target.transform.position - transform.position).magnitude;
+            if (distance <= _tankInterface.GetFireRange())
+            {
+                _tankInterface.Shoot();
+            }
         }
-        if (_currentPlayStyle == PlayStyle.aggresive)
+    }
+
+    private void MoveTankDelay()
+    {
+        _tankInterface.MoveTheTank("Forward");
+    }
+
+    private void SensorsCheck()
+    {
+        if (_eyes.Target == null)
         {
-            
-        } else if(_currentPlayStyle == PlayStyle.passive)
+            GoToTheNode();
+        }
+        else if (_eyes.Target != null)
         {
+            _hasANodeToMoveTo = false;
+            if (_eyes.Target.tag == "Tank")
+            {
+                if (_currentPlayStyle == PlayStyle.aggresive)
+                {
+                    _currentTankState = TankState.chasing;
+                }
+                if (_currentPlayStyle == PlayStyle.passive)
+                {
+                    _currentTankState = TankState.runningAway;
+                }
+            }
         }
     }
 
     private void Update()
     {
-        //SensorsCheck();
-        MovingTank();
+        SensorsCheck();
     }
 
     private void FixedUpdate()
     {
-
-    }
-
-
-
-
-
-    private void SensorsCheck()
-    {
-        //Debug.DrawLine(_rotationalObject.transform.position, transform.rotation., Color.blue);
-        //_rotationalObject.transform.Rotate(0f, .4f, 0f);
-        //int RaysToShoot = 80;
-
-        //float angle = 0;
-        //for (int i = 0; i < RaysToShoot; i++)
-        //{
-        //    float x = Mathf.Sin(angle);
-        //    float z = Mathf.Cos(angle);
-        //    angle += 2 * Mathf.PI / RaysToShoot;
-
-        //    Vector3 dir = new Vector3(transform.position.x + x, transform.position.y, transform.position.z + z);
-        //    RaycastHit hit;
-        //    Debug.DrawLine(transform.position, dir, Color.red);
-        //    if (Physics.Raycast(transform.position, dir, out hit))
-        //    {
-        //        if(hit.collider.gameObject.tag == "Bullet")
-        //        {
-        //            //Dodge
-        //        }
-        //    }
-        //}
+        MovingTank();
     }
 }
