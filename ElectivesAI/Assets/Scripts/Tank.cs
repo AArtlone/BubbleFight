@@ -31,6 +31,9 @@ public class Tank : MonoBehaviour
     #region References for the shooting function
     public GameObject BulletPrefab; // A reference to the the bullet object prefab
     public GameObject CannonHead;  // A reference to the canon head from which the bullet is being shot from
+    public GameObject ExplosionParticles;
+    public ParticleSystem ShootingParticles;
+    public ParticleSystem MovingParticles;
     #endregion
 
     private void Awake()
@@ -56,6 +59,7 @@ public class Tank : MonoBehaviour
 
         if (_velocity != Vector3.zero)
         {
+            MovingParticles.Play();
             if (direction == "Forwards" ||
                 direction == "Forward")
             {
@@ -146,6 +150,8 @@ public class Tank : MonoBehaviour
 
             // Adding force to the bullet
             bullet.GetComponent<Rigidbody>().AddForce(shootingPos.forward * _bulletSpeed * 200 * Time.fixedDeltaTime);
+            bullet.transform.forward = _turret.transform.forward;
+            ShootingParticles.Play();
 
             // We stop the player from shooting twice in order to emulate
             // the projectiles being loaded in after a moment depending on
@@ -183,9 +189,37 @@ public class Tank : MonoBehaviour
 
             if (_health <= 0)
             {
+                GameObject cameraObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cameraObj.transform.position = new Vector3(1000, 1000, 1000);
+                Camera newCamera = cameraObj.AddComponent<Camera>();
+
+                switch (gameObject.GetComponentInChildren<CameraBehaviour>().PositionOfCamera)
+                {
+                    case CameraBehaviour.CameraScreenPosition.TopLeft:
+                        newCamera.rect = new Rect(0, 0, 0.5f, 0.5f);
+                        break;
+                    case CameraBehaviour.CameraScreenPosition.TopRight:
+                        newCamera.rect = new Rect(0.5f, 0, 0.5f, 0.5f);
+                        break;
+                    case CameraBehaviour.CameraScreenPosition.BottomLeft:
+                        newCamera.rect = new Rect(0, 0.5f, 0.5f, 0.5f);
+                        break;
+                    case CameraBehaviour.CameraScreenPosition.BottomRight:
+                        newCamera.rect = new Rect(0.5f, 0.5f, 0.50f, 0.5f);
+                        break;
+                }
+
+                newCamera.cullingMask = 0;
+                newCamera.clearFlags = CameraClearFlags.SolidColor;
+                newCamera.backgroundColor = Color.black;
+
                 Destroy(gameObject);
             }
 
+            GameObject explosion = Instantiate(ExplosionParticles, other.transform.position, Quaternion.identity);
+            explosion.GetComponent<ParticleSystem>().Play();
+
+            Destroy(explosion, 1f);
             Destroy(other.gameObject);
         }
 
