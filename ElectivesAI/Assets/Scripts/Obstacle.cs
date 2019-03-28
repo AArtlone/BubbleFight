@@ -18,6 +18,10 @@ public class Obstacle : MonoBehaviour
         if (other.transform.tag == "Bullet")
         {
             ParticlesManager.Instance.CreateExplosion(other.transform);
+            if (gameObject.tag == "Tree")
+            {
+                Destroy(gameObject.transform.parent.gameObject);
+            }
         }
     }
 }

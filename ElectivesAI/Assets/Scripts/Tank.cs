@@ -5,7 +5,7 @@ public class Tank : MonoBehaviour
 {
     #region Default tank variables
     public string Name;
-    private int _health = 10;
+    private int _health = 1;
 
     private const float _movementSpeed = 250f;
     public readonly float RotationSpeed = 100f;
@@ -157,7 +157,7 @@ public class Tank : MonoBehaviour
             bullet.GetComponent<Rigidbody>().AddForce(shootingPos.forward * _bulletSpeed * 200 * Time.fixedDeltaTime);
             bullet.transform.forward = _turret.transform.forward;
             ShootingParticles.Play();
-
+            AudioManager.Instance.PlayShoot();
             _animator.SetBool("DidTankShoot", true);
             Invoke("ReturnTurretAfterShooting", 0.5f);
 
@@ -225,12 +225,12 @@ public class Tank : MonoBehaviour
                 newCamera.cullingMask = 0;
                 newCamera.clearFlags = CameraClearFlags.SolidColor;
                 newCamera.backgroundColor = Color.black;
-
-                Destroy(gameObject);
+                ParticlesManager.Instance.CreateExplosion(other.transform);
+                _interfaceManager.UpdateTankInterface();
+                GameManager.Instance.DestroyTank(gameObject);
             }
 
             ParticlesManager.Instance.CreateExplosion(other.transform);
-
             _interfaceManager.UpdateTankInterface();
         }
 
@@ -278,7 +278,7 @@ public class Tank : MonoBehaviour
                 nodeCollider.size = new Vector3(1.9f, 1.5f, 1.9f);
                 nodeCollider.isTrigger = true;
 
-                gameObject.transform.position = new Vector3(x * 2f - 25, 0.3f, y * 2f - 25);
+                gameObject.transform.position = new Vector3(x * 2f - 25, .5f, y * 2f - 25);
                 gameObject.transform.parent = nodeParent.transform;
                 var node = gameObject.AddComponent<AStarNode>();
 

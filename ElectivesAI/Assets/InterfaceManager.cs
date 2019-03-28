@@ -4,7 +4,7 @@ using UnityEngine;
 public class InterfaceManager : MonoBehaviour
 {
     public Tank _tankInterface;
-    public TextMeshProUGUI NameDisplay;
+    //public TextMeshProUGUI NameDisplay;
     public TextMeshProUGUI HealthDisplay;
 
     private void Start()
@@ -14,7 +14,7 @@ public class InterfaceManager : MonoBehaviour
 
     public void UpdateTankInterface()
     {
-        NameDisplay.text = "Tank - " + _tankInterface.Name;
-        HealthDisplay.text = "Hit Points - " + _tankInterface.GetHealth();
+        //ameDisplay.text = "Tank - " + _tankInterface.Name;
+        HealthDisplay.text = _tankInterface.GetHealth().ToString();
     }
 }

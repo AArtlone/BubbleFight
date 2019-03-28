@@ -12,6 +12,7 @@ TagManager:
   - NodeY
   - Obstacle
   - Bullet
+  - Tree
   layers:
   - Default
   - TransparentFX
