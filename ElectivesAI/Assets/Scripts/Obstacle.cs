@@ -4,12 +4,20 @@ public class Obstacle : MonoBehaviour
 {
     private void OnTriggerEnter(Collider other)
     {
-        if (other.transform.tag == "NodeN" ||
-            other.transform.tag == "NodeY" ||
-            other.transform.tag == "NodeD" ||
-            other.transform.tag == "NodeA")
+        if (gameObject.name != "Plane")
         {
-            other.GetComponent<AStarNode>().unWalkable = true;
+            if (other.transform.tag == "NodeN" ||
+                other.transform.tag == "NodeY" ||
+                other.transform.tag == "NodeD" ||
+                other.transform.tag == "NodeA")
+            {
+                other.GetComponent<AStarNode>().unWalkable = true;
+            }
+        }
+
+        if (other.transform.tag == "Bullet")
+        {
+            ParticlesManager.Instance.CreateExplosion(other.transform);
         }
     }
 }

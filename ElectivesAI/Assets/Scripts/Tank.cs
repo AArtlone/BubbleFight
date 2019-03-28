@@ -4,6 +4,7 @@ using UnityEngine;
 public class Tank : MonoBehaviour 
 {
     #region Default tank variables
+    public string Name;
     private int _health = 10;
 
     private const float _movementSpeed = 250f;
@@ -26,6 +27,8 @@ public class Tank : MonoBehaviour
     private Rigidbody _rb;
     private GameObject _turret;
     private VisionCone _eyes;
+    private Animator _animator;
+    private InterfaceManager _interfaceManager;
     #endregion
 
     #region References for the shooting function
@@ -48,6 +51,8 @@ public class Tank : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _turret = transform.GetChild(0).gameObject;
         _turretStartRotation = transform.position;
+        _animator = GetComponentInChildren<Animator>();
+        _interfaceManager = GetComponentInChildren<InterfaceManager>();
     }
 
     #region Tank movement and rotation functions
@@ -153,6 +158,9 @@ public class Tank : MonoBehaviour
             bullet.transform.forward = _turret.transform.forward;
             ShootingParticles.Play();
 
+            _animator.SetBool("DidTankShoot", true);
+            Invoke("ReturnTurretAfterShooting", 0.5f);
+
             // We stop the player from shooting twice in order to emulate
             // the projectiles being loaded in after a moment depending on
             // the fire rate.
@@ -168,6 +176,11 @@ public class Tank : MonoBehaviour
     private void EnableShooting()
     {
         _canShoot = true;
+    }
+
+    private void ReturnTurretAfterShooting()
+    {
+        _animator.SetBool("DidTankShoot", false);
     }
 
     // Destroys the instantiated bullet when its shot after a few seconds so
@@ -216,11 +229,9 @@ public class Tank : MonoBehaviour
                 Destroy(gameObject);
             }
 
-            GameObject explosion = Instantiate(ExplosionParticles, other.transform.position, Quaternion.identity);
-            explosion.GetComponent<ParticleSystem>().Play();
+            ParticlesManager.Instance.CreateExplosion(other.transform);
 
-            Destroy(explosion, 1f);
-            Destroy(other.gameObject);
+            _interfaceManager.UpdateTankInterface();
         }
 
         if (other.transform.tag == "Ammo Pickup")
@@ -264,10 +275,10 @@ public class Tank : MonoBehaviour
                 }
 
                 BoxCollider nodeCollider = gameObject.AddComponent<BoxCollider>();
-                nodeCollider.size = new Vector3(1.9f, 0.5f, 1.9f);
+                nodeCollider.size = new Vector3(1.9f, 1.5f, 1.9f);
                 nodeCollider.isTrigger = true;
 
-                gameObject.transform.position = new Vector3(x * 2f - 25, 0.32f, y * 2f - 25);
+                gameObject.transform.position = new Vector3(x * 2f - 25, 0.3f, y * 2f - 25);
                 gameObject.transform.parent = nodeParent.transform;
                 var node = gameObject.AddComponent<AStarNode>();
 
