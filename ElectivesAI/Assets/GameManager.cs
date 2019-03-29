@@ -23,6 +23,16 @@ public class GameManager : MonoBehaviour
         SceneManager.LoadScene(1);
     }
 
+    public void LoadCredits()
+    {
+        SceneManager.LoadScene("Credits");
+    }
+
+    public void LoadMainMenu()
+    {
+        SceneManager.LoadScene("Beginning");
+    }
+
     public void DestroyTank(GameObject tank)
     {
         ParticlesManager.Instance.CreateTankExplosion(tank.transform);

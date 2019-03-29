@@ -44,17 +44,22 @@ public class Diego : MonoBehaviour
                 tankInterface.RotateTurret(vision.Target.transform); //if in range, rotate turret and shoot
                 tankInterface.Shoot();
             }
+
+            if (vision.Target == null)
+            {
+                MoveTank();
+            }
         }
         else {
             tankInterface.RotateTheTank(gameObject.transform);
         }
         
         if (tankInterface.GetHealth()  <= 5 && (state == 0 || state == 2)) {
-            state = 1;
+            //state = 1;
         }
 
         if (tankInterface.GetAmmo() <= 0 && (state == 0 || state == 1)) {
-            state = 2;
+            //state = 2;
         }
         
         if (state == 1) //not yet implemented

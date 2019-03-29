@@ -241,7 +241,9 @@ public class Tank : MonoBehaviour
             Destroy(other.gameObject);
             //Debug.Log("Ammo retrieved.");
         }
+
     }
+
 
     private void GenerateGrid(string letter)
     {
