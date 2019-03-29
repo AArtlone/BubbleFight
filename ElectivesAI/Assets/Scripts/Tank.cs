@@ -1,5 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class Tank : MonoBehaviour 
 {
@@ -39,6 +41,8 @@ public class Tank : MonoBehaviour
     public ParticleSystem MovingParticles;
     #endregion
 
+    
+
     private void Awake()
     {
         string lastLetter = transform.parent.name.Substring(transform.parent.name.Length - 1);
@@ -53,6 +57,7 @@ public class Tank : MonoBehaviour
         _turretStartRotation = transform.position;
         _animator = GetComponentInChildren<Animator>();
         _interfaceManager = GetComponentInChildren<InterfaceManager>();
+
     }
 
     #region Tank movement and rotation functions
@@ -205,6 +210,7 @@ public class Tank : MonoBehaviour
                 GameObject cameraObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 cameraObj.transform.position = new Vector3(1000, 1000, 1000);
                 Camera newCamera = cameraObj.AddComponent<Camera>();
+                
 
                 switch (gameObject.GetComponentInChildren<CameraBehaviour>().PositionOfCamera)
                 {
@@ -221,6 +227,14 @@ public class Tank : MonoBehaviour
                         newCamera.rect = new Rect(0.5f, 0.5f, 0.50f, 0.5f);
                         break;
                 }
+
+                GameObject CanvasHolder = new GameObject("Canvas Holder");
+                CanvasHolder.transform.parent = cameraObj.gameObject.transform;
+                Canvas canvas = CanvasHolder.AddComponent<Canvas>();
+                GameObject TextHolder = new GameObject("Text Holder");
+                TextHolder.transform.parent = CanvasHolder.gameObject.transform;
+                Text myText = TextHolder.AddComponent<Text>();
+                myText.text = "LOL";
 
                 newCamera.cullingMask = 0;
                 newCamera.clearFlags = CameraClearFlags.SolidColor;
@@ -244,6 +258,17 @@ public class Tank : MonoBehaviour
 
     }
 
+    public static Text AddTextToCanvas(string textString, GameObject canvasGameObject)
+    {
+        Text text = canvasGameObject.AddComponent<Text>();
+        text.text = textString;
+
+        Font ArialFont = (Font)Resources.GetBuiltinResource(typeof(Font), "Arial.ttf");
+        text.font = ArialFont;
+        text.material = ArialFont.material;
+
+        return text;
+    }
 
     private void GenerateGrid(string letter)
     {
