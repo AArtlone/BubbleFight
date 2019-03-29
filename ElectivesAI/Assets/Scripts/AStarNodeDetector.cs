@@ -25,11 +25,14 @@ public class AStarNodeDetector : MonoBehaviour
     private void Update()
     {
         transform.position = _tankInterface.transform.position;
-        foreach (var node in PathOfTank)
+        if (PathOfTank != null)
         {
-            if (node != null && node.pathParent != null)
+            foreach (var node in PathOfTank)
             {
-                Debug.DrawLine(node.transform.position, node.pathParent.transform.position, Color.red);
+                if (node != null && node.pathParent != null)
+                {
+                    //Debug.DrawLine(node.transform.position, node.pathParent.transform.position, Color.red);
+                }
             }
         }
     }

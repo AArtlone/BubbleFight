@@ -33,16 +33,17 @@ public class Niq : MonoBehaviour
 
     private void Update()
     {
-        //Debug.Log(_isDestinationReached);
-        //Debug.Log(_eyes.Target);
-        if (_tankInterface.GetHealth() < 10 ||
-            _tankInterface.GetAmmo() <= 0)
-        {
-            // When the player is out of ammo, he will be in the evasive state 
-            // scouting for different objectives at the same time and trying to avoid
-            // enemies
-            _currentState = TankState.Evasive;
-        }
+        // Debug.Log(_isDestinationReached);
+        // Debug.Log(_eyes.Target);
+        
+        // if (_tankInterface.GetHealth() < 10 ||
+        //     _tankInterface.GetAmmo() <= 0)
+        // {
+        //     // When the player is out of ammo, he will be in the evasive state 
+        //     // scouting for different objectives at the same time and trying to avoid
+        //     // enemies
+        //     _currentState = TankState.Evasive;
+        // }
         
         if (_currentState != TankState.Evasive)
         {
@@ -148,7 +149,7 @@ public class Niq : MonoBehaviour
             {
                 if (hits[i].transform.tag == "Obstacle")
                 {
-                    Debug.DrawLine(transform.position, targetPosition, Color.cyan);
+                    //Debug.DrawLine(transform.position, targetPosition, Color.cyan);
                     _isWallInBetween = true;
                     _eyes.Target = null;
                 }
