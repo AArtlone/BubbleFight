@@ -24,7 +24,7 @@ public class LoadingManager : MonoBehaviour
 
     public void LoadNewScene(string newScene)
     {
-        UpdateLoaderInfo(0);
+        //UpdateLoaderInfo(0);
         StartCoroutine(StartLoadingMainGame(newScene));
     }
 
@@ -34,11 +34,11 @@ public class LoadingManager : MonoBehaviour
 
         while (_operation.isDone == false)
         {
-            UpdateLoaderInfo(_operation.progress);
+            //UpdateLoaderInfo(_operation.progress);
             yield return null;
         }
 
-        UpdateLoaderInfo(_operation.progress);
+        //UpdateLoaderInfo(_operation.progress);
         _operation = null;
     }
 
