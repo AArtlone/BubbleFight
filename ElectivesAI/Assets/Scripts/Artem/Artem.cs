@@ -29,8 +29,10 @@ public class Artem : MonoBehaviour
     private TankState _currentTankState;
     public GameObject[] _array;
     public LayerMask NodeMask;
+    private GameObject _randomNode;
     private bool _hasANodeToMoveTo;
     private bool _targetToChase;
+    private bool _isWallInBetween = false;
 
     private void Start()
     {
@@ -63,15 +65,35 @@ public class Artem : MonoBehaviour
     private void ChooseRandomNode()
     {
         _aStarNodeDetector.PathOfTank = null;
-        GameObject randomNode = _array[Random.Range(0, _array.Length - 1)];
-        if(randomNode)
+        _randomNode = null;
+        _randomNode = _array[Random.Range(0, _array.Length - 1)];
+
+        bool isThereAWalkableNode = false;
+        for (int i = 0; i < _array.Length; i++) {
+            if (_array[i].GetComponent<AStarNode>().unWalkable == false) {
+                isThereAWalkableNode = true;
+                break;
+            }
+        }
+
+        if (isThereAWalkableNode) {
+            while (_randomNode.GetComponent<AStarNode>().unWalkable == true)
+            { 
+                _randomNode = _array[Random.Range(0, _array.Length - 1)];
+            }
+        }
+        
+        if (_randomNode.GetComponent<AStarNode>().unWalkable == false)
         {
-            _aStarPath.startNode = _aStarNodeDetector.CurrentNode;
-            _aStarPath.endNode = randomNode.GetComponent<AStarNode>();
-            _aStarNodeDetector.PathOfTank = _aStarPath.FindShortestPath();
-            _aStarNodeDetector.CurrentNodeIndexInPath = 1;
-            _hasANodeToMoveTo = true;
-            _currentTankState = TankState.movingTowardsANode;
+            if (_randomNode)
+            {
+                _aStarPath.startNode = _aStarNodeDetector.CurrentNode;
+                _aStarPath.endNode = _randomNode.GetComponent<AStarNode>();
+                _aStarNodeDetector.PathOfTank = _aStarPath.FindShortestPath();
+                _aStarNodeDetector.CurrentNodeIndexInPath = 1;
+                _hasANodeToMoveTo = true;
+                _currentTankState = TankState.movingTowardsANode;
+            }
         }
     }
 
@@ -79,7 +101,7 @@ public class Artem : MonoBehaviour
     {
         if(_hasANodeToMoveTo == false)
         {
-            ChooseRandomNode();
+            Invoke("ChooseRandomNode", .1f);
         }
     }
 
@@ -126,12 +148,17 @@ public class Artem : MonoBehaviour
         }
         if (_currentTankState == TankState.chasing)
         {
-            _tankInterface.RotateTheTank(_eyes.Target.transform);
-            _tankInterface.MoveTheTank("Forward");
-            float distance = (_eyes.Target.transform.position - transform.position).magnitude;
-            if (distance <= _tankInterface.GetFireRange())
-            {
-                _tankInterface.Shoot();
+            if(_eyes.Target != null && !_isWallInBetween) {
+                float distance = (_eyes.Target.transform.position - transform.position).magnitude;
+                if (distance > (_tankInterface.GetFireRange() / 2)) {
+                    _tankInterface.RotateTheTank(_eyes.Target.transform);
+                    _tankInterface.MoveTheTank("Forward");
+                }
+                if (distance <= _tankInterface.GetFireRange())
+                {
+                    _tankInterface.RotateTheTank(_eyes.Target.transform);
+                    _tankInterface.Shoot();
+                }
             }
         }
         if (_currentTankState == TankState.runningAway)
@@ -181,6 +208,27 @@ public class Artem : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (_eyes.Target != null)
+        {
+            Vector3 targetPosition = _eyes.Target.transform.position;
+            Vector3 direction = targetPosition - transform.position;
+            float length = direction.magnitude;
+            direction.Normalize();
+
+            Ray ray = new Ray(transform.position, direction);
+            RaycastHit[] hits = Physics.RaycastAll(ray, length);
+
+            _isWallInBetween = false;
+            for (int i = 0; i < hits.Length; i++)
+            {
+                if (hits[i].transform.tag == "Obstacle")
+                {
+                    Debug.DrawLine(transform.position, targetPosition, Color.cyan);
+                    _isWallInBetween = true;
+                    _eyes.Target = null;
+                }
+            }
+        }
         MovingTank();
     }
 }

@@ -5,7 +5,7 @@ public class Tank : MonoBehaviour
 {
     #region Default tank variables
     public string Name;
-    private int _health = 1;
+    private int _health = 10;
 
     private const float _movementSpeed = 250f;
     public readonly float RotationSpeed = 100f;

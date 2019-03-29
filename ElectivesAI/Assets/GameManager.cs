@@ -27,6 +27,6 @@ public class GameManager : MonoBehaviour
     {
         ParticlesManager.Instance.CreateTankExplosion(tank.transform);
         AudioManager.Instance.PlayExplosion();
-        Destroy(tank);
+        Destroy(tank.transform.parent);
     }
 }
