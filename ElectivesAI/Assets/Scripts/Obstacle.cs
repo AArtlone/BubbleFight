@@ -20,6 +20,7 @@ public class Obstacle : MonoBehaviour
             ParticlesManager.Instance.CreateExplosion(other.transform);
             if (gameObject.tag == "Tree")
             {
+                AudioManager.Instance.PlayTreeDestroyed();
                 Destroy(gameObject.transform.parent.gameObject);
             }
         }

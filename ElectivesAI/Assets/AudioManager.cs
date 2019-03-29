@@ -11,6 +11,7 @@ public class AudioManager : MonoBehaviour
     public AudioClip ShootSound;
     public AudioClip HitSound;
     public AudioClip ExplosionSound;
+    public AudioClip TreeExplosionSound;
 
     private void Awake()
     {
@@ -40,5 +41,8 @@ public class AudioManager : MonoBehaviour
         AudioSource.PlayOneShot(ExplosionSound, .5f);
     }
 
-    
+    public void PlayTreeDestroyed()
+    {
+        AudioSource.PlayOneShot(TreeExplosionSound, .5f);
+    }
 }

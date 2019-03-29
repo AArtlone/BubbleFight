@@ -42,20 +42,13 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-
         if (SceneManager.GetActiveScene() == SceneManager.GetSceneByName("MainGame"))
         {
             if (GameObject.FindGameObjectsWithTag("Tank").Length <= 1)
             {
                 SceneManager.LoadScene("EndGame");
-            }
-                
+            }       
         }
-        
-                
-
-        Debug.Log(GameObject.FindGameObjectsWithTag("Tank").Length);
+        //Debug.Log(GameObject.FindGameObjectsWithTag("Tank").Length);
     }
-
-
 }

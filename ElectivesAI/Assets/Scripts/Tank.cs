@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -228,13 +229,28 @@ public class Tank : MonoBehaviour
                         break;
                 }
 
+                // IN PROGRESS !!
+                // Canvas game object
                 GameObject CanvasHolder = new GameObject("Canvas Holder");
                 CanvasHolder.transform.parent = cameraObj.gameObject.transform;
+
+                // Canvas-dependent components
+                CanvasHolder.AddComponent<RectTransform>();
                 Canvas canvas = CanvasHolder.AddComponent<Canvas>();
+                CanvasScaler canvasScaler = CanvasHolder.AddComponent<CanvasScaler>();
+                canvasScaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+                CanvasHolder.AddComponent<GraphicRaycaster>();
+
+                canvas.renderMode = RenderMode.ScreenSpaceCamera;
+                canvas.worldCamera = newCamera;
+                canvas.planeDistance = 1;
+
+                // Text label of the new canvas game over screen for that tank.
                 GameObject TextHolder = new GameObject("Text Holder");
                 TextHolder.transform.parent = CanvasHolder.gameObject.transform;
-                Text myText = TextHolder.AddComponent<Text>();
-                myText.text = "LOL";
+                TextMeshProUGUI myText = TextHolder.AddComponent<TextMeshProUGUI>();
+                myText.text = "Hello World";
+                myText.transform.localPosition = new Vector3(0, 0, 0);
 
                 newCamera.cullingMask = 0;
                 newCamera.clearFlags = CameraClearFlags.SolidColor;

@@ -11,7 +11,7 @@ public enum PlayStyle
 
 public enum TankState
 {
-    movingTowardsANode,
+    wandering,
     chasing,
     runningAway,
     dodging
@@ -33,6 +33,7 @@ public class Artem : MonoBehaviour
     private bool _hasANodeToMoveTo;
     private bool _targetToChase;
     private bool _isWallInBetween = false;
+    private InterfaceManager _interfaceManager;
 
     private void Start()
     {
@@ -43,6 +44,7 @@ public class Artem : MonoBehaviour
             <AStarNodeDetector>();
         _nodeGrid = GameObject.Find("NodeListA");
         _array = new GameObject[26 * 26];
+        _interfaceManager = GetComponentInChildren<InterfaceManager>();
 
         ChooseRandomPlayStyle();
         CreateNodeArray();
@@ -92,7 +94,7 @@ public class Artem : MonoBehaviour
                 _aStarNodeDetector.PathOfTank = _aStarPath.FindShortestPath();
                 _aStarNodeDetector.CurrentNodeIndexInPath = 1;
                 _hasANodeToMoveTo = true;
-                _currentTankState = TankState.movingTowardsANode;
+                _currentTankState = TankState.wandering;
             }
         }
     }
@@ -132,7 +134,7 @@ public class Artem : MonoBehaviour
 
     private void MovingTank()
     {
-        if(_currentTankState == TankState.movingTowardsANode &&
+        if(_currentTankState == TankState.wandering &&
             _aStarNodeDetector.CurrentNode != _aStarPath.endNode)
         {
             _tankInterface.RotateTheTank(_aStarNodeDetector.PathOfTank
@@ -204,6 +206,7 @@ public class Artem : MonoBehaviour
     private void Update()
     {
         SensorsCheck();
+        _interfaceManager.UpdateStateDisplay(_currentTankState.ToString());
     }
 
     private void FixedUpdate()

@@ -6,6 +6,7 @@ public class InterfaceManager : MonoBehaviour
     public Tank _tankInterface;
     //public TextMeshProUGUI NameDisplay;
     public TextMeshProUGUI HealthDisplay;
+    public TextMeshProUGUI StateDisplay;
 
     private void Start()
     {
@@ -16,5 +17,9 @@ public class InterfaceManager : MonoBehaviour
     {
         //ameDisplay.text = "Tank - " + _tankInterface.Name;
         HealthDisplay.text = _tankInterface.GetHealth().ToString();
+    }
+
+    public void UpdateStateDisplay(string newState) {
+        StateDisplay.text = newState;
     }
 }

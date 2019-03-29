@@ -11,6 +11,7 @@ public class Youri : MonoBehaviour
     private bool _lookForNewTarget = true;
     public LayerMask NodeMask;
     private bool _isFirstPathInitialized = false;
+    private InterfaceManager _interfaceManager;
 
     private enum TankState
     {
@@ -25,10 +26,12 @@ public class Youri : MonoBehaviour
         _eyes = transform.parent.GetComponentInChildren<VisionCone>();
         _AStarPath = transform.parent.GetComponentInChildren<AStarPath>();
         _nodeDetector = transform.parent.GetComponentInChildren<AStarNodeDetector>();
+        _interfaceManager = GetComponentInChildren<InterfaceManager>();
     }
 
     private void Update()
     {
+        _interfaceManager.UpdateStateDisplay(tankBehaviour.ToString());
         //Fight
         //stay in patrol state until enemy tank is found 
         //when seeing an enemy, try to get in range for shooting

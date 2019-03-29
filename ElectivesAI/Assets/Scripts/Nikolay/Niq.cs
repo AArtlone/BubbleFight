@@ -19,6 +19,7 @@ public class Niq : MonoBehaviour
     // be toggled triggering different behaviour.
     private enum TankState { Wandering, Combat, Evasive }
     private TankState _currentState;
+    private InterfaceManager _interfaceManager;
 
     private void Start()
     {
@@ -27,6 +28,7 @@ public class Niq : MonoBehaviour
         _eyes = transform.parent.GetComponentInChildren<VisionCone>();
         _AStarPath = transform.parent.GetComponentInChildren<AStarPath>();
         _nodeDetector = transform.parent.GetComponentInChildren<AStarNodeDetector>();
+        _interfaceManager = GetComponentInChildren<InterfaceManager>();
 
         _nodeDetector.CurrentNode = _AStarPath.endNode;
     }
@@ -35,7 +37,7 @@ public class Niq : MonoBehaviour
     {
         // Debug.Log(_isDestinationReached);
         // Debug.Log(_eyes.Target);
-        
+
         // if (_tankInterface.GetHealth() < 10 ||
         //     _tankInterface.GetAmmo() <= 0)
         // {
@@ -44,7 +46,9 @@ public class Niq : MonoBehaviour
         //     // enemies
         //     _currentState = TankState.Evasive;
         // }
-        
+
+        _interfaceManager.UpdateStateDisplay(_currentState.ToString());
+
         if (_currentState != TankState.Evasive)
         {
             if (_eyes.Target != null)

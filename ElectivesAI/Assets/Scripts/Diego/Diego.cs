@@ -14,6 +14,7 @@ public class Diego : MonoBehaviour
 
     private bool lookForTarget = true;
     public LayerMask NodeMask;
+    private InterfaceManager _interfaceManager;
 
     private void Start()
     {
@@ -24,13 +25,16 @@ public class Diego : MonoBehaviour
         aNodeDetector = transform.parent.GetComponentInChildren<AStarNodeDetector>();
         aNodeDetector.CurrentNode = aStarPath.endNode;
         nodeGrid = GameObject.Find("NodeListD");
+        _interfaceManager = GetComponentInChildren<InterfaceManager>();
     }
 
     private void Update()
     {
+        
         //health
         if (state == 0) //offensive state
         {
+            _interfaceManager.UpdateStateDisplay("Offensive");
             if (vision.DistanceToTarget > tankInterface.GetFireRange()) //if distance between tank and target is bigger than fire range
             {
                 if (lookForTarget)
